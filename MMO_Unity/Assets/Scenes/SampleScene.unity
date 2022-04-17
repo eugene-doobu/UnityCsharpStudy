@@ -942,7 +942,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1388852089}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.7, z: -3.3}
+  m_LocalPosition: {x: -19.5, y: 2.7, z: -3.3}
   m_LocalScale: {x: 14, y: 9, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1142,6 +1142,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4073572245256716378, guid: ac0aab6b738f19049844658069fae2c0, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 49c4f504f2b6b554cad6e62144d10874, type: 2}
     - target: {fileID: 4073572245266215644, guid: ac0aab6b738f19049844658069fae2c0, type: 3}
       propertyPath: m_Name
       value: unitychan
