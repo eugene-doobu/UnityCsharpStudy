@@ -7,87 +7,89 @@ using UnityEngine.PlayerLoop;
 public class PlayerController : MonoBehaviour
 {
     public float _speed = 6f;
-
-    private bool _moveToDest = false;
     private Vector3 _destPos;
+
+    private float wait_run_ratio = 0;
+    
+    public enum PlayerState
+    {
+        Die,
+        Moving,
+        Idle
+    }
+
+    private PlayerState _state = PlayerState.Idle;
     
     void Start()
     {
-        Managers.Input.KeyAction -= OnKeyboard;
-        Managers.Input.KeyAction += OnKeyboard;
         Managers.Input.MouseAction -= OnMouseClicked;
         Managers.Input.MouseAction += OnMouseClicked;
     }
 
-    private void Update()
+    void UpdateDie()
     {
-        if (_moveToDest)
-        {
-            Vector3 dir = _destPos - transform.position;
-            if (dir.magnitude < 0.0001f)
-            {
-                _moveToDest = false;
-            }
-            else
-            {
-                float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
-                
-                transform.position += dir.normalized * moveDist;
-                transform.rotation =
-                    Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-            }
-        }
+        
+    }
 
-        if (_moveToDest)
+    void UpdateMoving()
+    {
+        Vector3 dir = _destPos - transform.position;
+        if (dir.magnitude < 0.0001f)
         {
-            Animator anim = GetComponent<Animator>();
-            anim.Play("RUN");
+            _state = PlayerState.Idle;
         }
         else
         {
-            Animator anim = GetComponent<Animator>();
-            anim.Play("WAIT");
+            float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+                
+            transform.position += dir.normalized * moveDist;
+            transform.rotation =
+                Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
+        
+        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1, 10 * Time.deltaTime);
+        Animator anim = GetComponent<Animator>();
+        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.Play("WAIT_RUN");
     }
 
-    void OnKeyboard()
+    void UpdateIdle()
     {
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
-            transform.position += Vector3.forward * Time.deltaTime * _speed;
-        }
+        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0, 10 * Time.deltaTime);
+        Animator anim = GetComponent<Animator>();
+        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.Play("WAIT_RUN");
+    }
 
-        if (Input.GetKey(KeyCode.S))
+    private void Update()
+    {
+        switch (_state)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
-            transform.position += Vector3.back * Time.deltaTime * _speed;
+            case PlayerState.Die:
+                UpdateDie();
+                break;
+            case PlayerState.Moving:
+                UpdateMoving();
+                break;
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
         }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
-            transform.position += Vector3.left * Time.deltaTime * _speed;
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
-            transform.position += Vector3.right * Time.deltaTime * _speed;
-        }
-        _moveToDest = false;
     }
 
     void OnMouseClicked(Define.MouseEvent evt)
     {
+        if (_state == PlayerState.Die)
+            return;
+        
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
 
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
         {
-            _moveToDest = true;
             _destPos = hit.point;
+            _state = PlayerState.Moving;
         }
     }
 }
