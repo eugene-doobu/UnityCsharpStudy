@@ -8,8 +8,6 @@ public class PlayerController : MonoBehaviour
 {
     public float _speed = 6f;
     private Vector3 _destPos;
-
-    private float wait_run_ratio = 0;
     
     public enum PlayerState
     {
@@ -47,18 +45,14 @@ public class PlayerController : MonoBehaviour
                 Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
         
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1, 10 * Time.deltaTime);
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
-        anim.Play("WAIT_RUN");
+        anim.SetFloat("speed", _speed);
     }
 
     void UpdateIdle()
     {
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0, 10 * Time.deltaTime);
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
-        anim.Play("WAIT_RUN");
+        anim.SetFloat("speed", 0);
     }
 
     private void Update()
