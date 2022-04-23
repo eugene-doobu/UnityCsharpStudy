@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class Util
 {
+    public static GameObject FindChild(GameObject go, string name = null, bool recursive = false)
+    {
+        Transform transform = FindChild<Transform>(go, name, recursive);
+        if (transform == null)
+            return null;
+        return transform.gameObject;
+    }
+    
     public static T FindChild<T>(GameObject go, string name = null, bool recursive = false) where T : UnityEngine.Object
     {
         if (go == null)
@@ -30,7 +38,7 @@ public class Util
                     return component;
             }
         }
-
+        
         return null;
     }
 }
