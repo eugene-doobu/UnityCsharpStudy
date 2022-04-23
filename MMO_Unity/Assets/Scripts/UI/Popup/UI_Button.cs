@@ -6,7 +6,7 @@ using System;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
-public class UI_Button : UI_Base
+public class UI_Button : UI_Popup
 {
     
     enum Buttons
