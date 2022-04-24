@@ -20,4 +20,12 @@ public class Define : MonoBehaviour
     {
         QuaterView
     }
+
+    public enum Scene
+    {
+        Unknown,
+        Login,
+        Lobby,
+        Game,
+    }
 }
