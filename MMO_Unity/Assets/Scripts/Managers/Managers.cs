@@ -18,13 +18,15 @@ public class Managers : MonoBehaviour
     private InputManager _input = new InputManager();
     private ResourceManager _resource = new ResourceManager();
     private SceneManagerEx _sceneManagerEx = new SceneManagerEx();
+    private SoundManager _sound = new SoundManager();
     private UIManager _ui = new UIManager();
     
     public static InputManager Input => Instance._input;
     public static ResourceManager Resource => Instance._resource;
     public static SceneManagerEx Scene => Instance._sceneManagerEx;
+    public static SoundManager Sound => Instance._sound;
     public static UIManager UI => Instance._ui;
-    
+
 
     void Start()
     {
