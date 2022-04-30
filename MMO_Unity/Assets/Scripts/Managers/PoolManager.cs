@@ -48,6 +48,10 @@ public class PoolManager
                 poolable = _poolStack.Pop();
             else
                 poolable = Create();
+
+            // DontDestroyOnLoad 해제
+            if (parent == null)
+                poolable.transform.parent = Managers.Scene.CurrentScene.transform;
             
             poolable.gameObject.SetActive(true);
             poolable.transform.parent = parent;
