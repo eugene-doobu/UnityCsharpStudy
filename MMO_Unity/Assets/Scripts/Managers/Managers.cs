@@ -16,13 +16,15 @@ public class Managers : MonoBehaviour
         }
     }
 
+    private DataManager _data = new DataManager();
     private InputManager _input = new InputManager();
     private PoolManager _pool = new PoolManager();
     private ResourceManager _resource = new ResourceManager();
     private SceneManagerEx _sceneManagerEx = new SceneManagerEx();
     private SoundManager _sound = new SoundManager();
     private UIManager _ui = new UIManager();
-    
+
+    public static DataManager Data = Instance._data;
     public static InputManager Input => Instance._input;
     public static PoolManager Pool => Instance._pool;
     public static ResourceManager Resource => Instance._resource;
@@ -56,6 +58,7 @@ public class Managers : MonoBehaviour
             DontDestroyOnLoad(go);
             s_instance = go.GetComponent<Managers>();   
             
+            s_instance._data.Init();
             s_instance._pool.Init();
             s_instance._sound.Init();
         }
