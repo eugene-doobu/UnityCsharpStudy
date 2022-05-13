@@ -12,16 +12,33 @@ public class Stat
 }
 
 [Serializable]
-public class StatData
+public class StatData : ILoader<int, Stat>
 {
     public List<Stat> stats = new List<Stat>();
+    public Dictionary<int, Stat> MakeDict()
+    {
+        public Dictionary<int, Stat> dict { get; private set; } = new Dictionary<int, Stat>();
+
+        foreach (Stat stat in data.stats)
+        {
+            dict.Add(stat.level, stat);
+        }
+    }
+}
+
+public interface ILoader<Key, Value>
+{
+    Dictionary<Key, Value> MakeDict();
 }
 
 public class DataManager
 {
+    public Dictionary<int, Stat> StatDict { get; private set; } = new Dictionary<int, Stat>();
+
     public void Init()
     {
         TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/StatData");
-        StatData stat = JsonUtility.FromJson<StatData>(textAsset.text);
+        StatData data = JsonUtility.FromJson<StatData>(textAsset.text);
+
     }
 }
