@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class Define : MonoBehaviour
 {
+    public enum Layer
+    {
+        Monster = 6,
+        Ground = 7,
+        Block = 8,
+    }
+    
     public enum UIEvent
     {
         Click,

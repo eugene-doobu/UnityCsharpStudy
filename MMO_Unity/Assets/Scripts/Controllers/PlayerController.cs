@@ -7,20 +7,23 @@ using UnityEngine.PlayerLoop;
 
 public class PlayerController : MonoBehaviour
 {
-    public float _speed = 6f;
+    private PlayerStat _stat;
     private Vector3 _destPos;
     
     public enum PlayerState
     {
         Die,
         Moving,
-        Idle
+        Idle,
+        Skill,
     }
 
     private PlayerState _state = PlayerState.Idle;
     
     void Start()
     {
+        _stat = GetComponent<PlayerStat>();
+        
         Managers.Input.MouseAction -= OnMouseClicked;
         Managers.Input.MouseAction += OnMouseClicked;
     }
@@ -40,7 +43,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
-            float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+            float moveDist = Mathf.Clamp(_stat.Speed * Time.deltaTime, 0, dir.magnitude);
             nma.Move(dir.normalized * moveDist);
             
             Debug.DrawRay(transform.position, dir.normalized, Color.green);
@@ -56,7 +59,7 @@ public class PlayerController : MonoBehaviour
         }
         
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("speed", _speed);
+        anim.SetFloat("speed", _stat.Speed);
     }
 
     void UpdateIdle()
@@ -81,6 +84,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private int _mask = (1 << (int) Define.Layer.Ground) | (1 << (int) Define.Layer.Monster);
+    
     void OnMouseClicked(Define.MouseEvent evt)
     {
         if (_state == PlayerState.Die)
@@ -90,10 +95,19 @@ public class PlayerController : MonoBehaviour
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
 
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
+        if (Physics.Raycast(ray, out hit, 100.0f, _mask))
         {
             _destPos = hit.point;
             _state = PlayerState.Moving;
+
+            if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+            {
+                Debug.Log("mmn");
+            }
+            else
+            {
+                Debug.Log("hi2");
+            }
         }
     }
 }

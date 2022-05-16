@@ -9,7 +9,7 @@ public class GameScene : BaseScene
         base.Init();
         SceneType = Define.Scene.Game;
 
-        Dictionary<int, Stat> dict = Managers.Data.StatDict;
+        Dictionary<int, Data.Stat> dict = Managers.Data.StatDict;
     }
 
     public override void Clear()
