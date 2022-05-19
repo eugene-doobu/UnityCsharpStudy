@@ -27,7 +27,9 @@ public class Define : MonoBehaviour
     public enum MouseEvent
     {
         Press,
-        Click
+        PointerDown,
+        PointerUp,
+        Click,
     }
     
     public enum CameraMode

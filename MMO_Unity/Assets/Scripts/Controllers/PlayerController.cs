@@ -9,18 +9,6 @@ public class PlayerController : MonoBehaviour
 {
     private PlayerStat _stat;
     private Vector3 _destPos;
-
-    private Texture2D _attackIcon;
-    private Texture2D _handIcon;
-
-    enum CursorType
-    {
-        None,
-        Attack,
-        Hand,
-    }
-
-    private CursorType _cursorType = CursorType.None;
     
     public enum PlayerState
     {
@@ -30,17 +18,43 @@ public class PlayerController : MonoBehaviour
         Skill,
     }
 
+    [SerializeField]
     private PlayerState _state = PlayerState.Idle;
+
+    public PlayerState State
+    {
+        get { return _state; }
+        set
+        {
+            _state = value;
+            
+            Animator anim = GetComponent<Animator>();
+            switch (_state)
+            {
+                case PlayerState.Die:
+                    anim.SetBool("attack", false);
+                    break;
+                case PlayerState.Idle:
+                    anim.SetBool("attack", false);
+                    anim.SetFloat("speed", 0);
+                    break;
+                case PlayerState.Moving:
+                    anim.SetBool("attack", false);
+                    anim.SetFloat("speed", _stat.Speed);
+                    break;
+                case PlayerState.Skill:
+                    anim.SetBool("attack", true);
+                    break;
+            }
+        }
+    }
     
     void Start()
     {
-        _attackIcon = Managers.Resource.Load<Texture2D>("Textures/Cursor/Attack");
-        _handIcon = Managers.Resource.Load<Texture2D>("Textures/Cursor/Hand");
-
         _stat = GetComponent<PlayerStat>();
         
-        Managers.Input.MouseAction -= OnMouseClicked;
-        Managers.Input.MouseAction += OnMouseClicked;
+        Managers.Input.MouseAction -= OnMouseEvent;
+        Managers.Input.MouseAction += OnMouseEvent;
     }
 
     void UpdateDie()
@@ -50,10 +64,22 @@ public class PlayerController : MonoBehaviour
 
     void UpdateMoving()
     {
+        // 몬스터가 내 사정거리보다 가까우면 공격
+        if (_lockTarget != null)
+        {
+            float distance = (_destPos - transform.position).magnitude;
+            if (distance <= 1)
+            {
+                State = PlayerState.Skill;
+                return;
+            }
+        }
+        
+        // 이동
         Vector3 dir = _destPos - transform.position;
         if (dir.magnitude < 0.1f)
         {
-            _state = PlayerState.Idle;
+            State = PlayerState.Idle;
         }
         else
         {
@@ -64,7 +90,8 @@ public class PlayerController : MonoBehaviour
             Debug.DrawRay(transform.position, dir.normalized, Color.green);
             if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1f, LayerMask.GetMask("Block")))
             {
-                _state = PlayerState.Idle;
+                if(Input.GetMouseButton(0) == false)
+                    State = PlayerState.Idle;
                 return;
             }
         
@@ -72,21 +99,20 @@ public class PlayerController : MonoBehaviour
             transform.rotation =
                 Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
-        
-        Animator anim = GetComponent<Animator>();
-        anim.SetFloat("speed", _stat.Speed);
+    }
+
+    void OnHitEvent()
+    {
+        State = PlayerState.Moving;
     }
 
     void UpdateIdle()
     {
-        Animator anim = GetComponent<Animator>();
-        anim.SetFloat("speed", 0);
     }
 
     private void Update()
     {
-        UpdateMouseCursor();
-        switch (_state)
+        switch (State)
         {
             case PlayerState.Die:
                 UpdateDie();
@@ -97,59 +123,53 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
                 UpdateIdle();
                 break;
+            case PlayerState.Skill:
+                UpdateSkill();
+                break;
         }
     }
 
-    void UpdateMouseCursor()
+    void UpdateSkill()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100.0f, _mask))
-        {
-            if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
-            {
-                if (_cursorType != CursorType.Attack)
-                {
-                    Cursor.SetCursor(_attackIcon, new Vector2(_attackIcon.width / 5, 0), CursorMode.Auto);
-                    _cursorType = CursorType.Attack;
-                }
-            }
-            else
-            {
-                if (_cursorType != CursorType.Hand)
-                {
-                    Cursor.SetCursor(_handIcon, new Vector2(_handIcon.width / 3, 0), CursorMode.Auto);
-                    _cursorType = CursorType.Hand;
-                }
-            }
-        }
     }
 
     private int _mask = (1 << (int) Define.Layer.Ground) | (1 << (int) Define.Layer.Monster);
+    private GameObject _lockTarget;
     
-    void OnMouseClicked(Define.MouseEvent evt)
+    void OnMouseEvent(Define.MouseEvent evt)
     {
-        if (_state == PlayerState.Die)
+        if (State == PlayerState.Die)
             return;
         
+        RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        bool raycastHit = Physics.Raycast(ray, out hit, 100.0f, _mask);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
 
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100.0f, _mask))
+        switch (evt)
         {
-            _destPos = hit.point;
-            _state = PlayerState.Moving;
+            case Define.MouseEvent.PointerDown:
+            {
+                if (raycastHit)
+                {
+                    _destPos = hit.point;
+                    State = PlayerState.Moving;
 
-            if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
-            {
-                Debug.Log("mmn");
+                    if (hit.collider.gameObject.layer == (int) Define.Layer.Monster)
+                        _lockTarget = hit.collider.gameObject;
+                    else
+                        _lockTarget = null;
+                }
             }
-            else
+                break;
+            case Define.MouseEvent.Press:
             {
-                Debug.Log("hi2");
+                if (_lockTarget != null)
+                    _destPos = _lockTarget.transform.position;
+                else if (raycastHit)
+                    _destPos = hit.point;
             }
+                break;
         }
     }
 }
