@@ -23,6 +23,7 @@ public class MonsterController : BaseController
     {
         GameObject player = Managers.Game.GetPlayer();
         if (player == null) return;
+        if (player.GetComponent<PlayerController>() == (State == Define.State.Die)) return;
 
         float distance = (player.transform.position - transform.position).magnitude;
         if (distance <= _scanRange)
@@ -91,7 +92,7 @@ public class MonsterController : BaseController
             }
             else
             {
-                State = Define.State.Idle;
+                State = Define.State.Die;
             }
         }
         else

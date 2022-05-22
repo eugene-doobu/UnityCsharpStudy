@@ -21,6 +21,11 @@ public class PlayerController : BaseController
 			Managers.UI.MakeWorldSpaceUI<UI_HPBar>(transform);
     }
 
+	protected override void UpdateDie()
+	{
+		Managers.Input.MouseAction -= OnMouseEvent;
+	}
+
 	protected override void UpdateMoving()
 	{
 		// 몬스터가 내 사정거리보다 가까우면 공격

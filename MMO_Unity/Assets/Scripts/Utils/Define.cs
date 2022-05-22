@@ -49,7 +49,8 @@ public class Define : MonoBehaviour
     
     public enum CameraMode
     {
-        QuaterView
+        QuaterView,
+        DieView,
     }
 
     public enum Scene

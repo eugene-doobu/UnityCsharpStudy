@@ -69,5 +69,7 @@ public class PlayerStat : Stat
     protected override void OnDead(Stat attacker)
     {
         Debug.Log("Dead..");
+        Camera.main.gameObject.GetOrAddComponent<CameraController>().SetCameraState(Define.CameraMode.DieView);
+        GetComponent<PlayerController>().State = Define.State.Die;
     }
 }
