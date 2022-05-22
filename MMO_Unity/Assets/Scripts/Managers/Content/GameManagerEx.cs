@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ public class GameManagerEx
     //private Dictionary<int, GameObject> _players = new Dictionary<int, GameObject>();
     HashSet<GameObject> _monsters = new HashSet<GameObject>();
 
+    public Action<int> OnSpawnEvent;
+    
     public GameObject GetPlayer() => _player;
     
     // 이후 데이터파일에서 가져온다고 가정하면 type, path를 제외하고 Object ID만 전달
@@ -19,6 +22,7 @@ public class GameManagerEx
         {
             case Define.WorldObject.Monster:
                 _monsters.Add(go);
+                OnSpawnEvent?.Invoke(1);
                 break;
             case Define.WorldObject.Player:
                 _player = go;
@@ -40,7 +44,10 @@ public class GameManagerEx
         {
             case Define.WorldObject.Monster:
                 if (_monsters.Contains(go))
+                {
                     _monsters.Remove(go);
+                    OnSpawnEvent?.Invoke(-1);
+                }
                 break;
             case Define.WorldObject.Player:
                 if (_player == go)

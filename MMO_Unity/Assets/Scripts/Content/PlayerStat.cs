@@ -68,6 +68,6 @@ public class PlayerStat : Stat
     
     protected override void OnDead(Stat attacker)
     {
-        
+        Debug.Log("Dead..");
     }
 }
