@@ -8,6 +8,8 @@ public class GameManagerEx
     //private Dictionary<int, GameObject> _players = new Dictionary<int, GameObject>();
     HashSet<GameObject> _monsters = new HashSet<GameObject>();
 
+    public GameObject GetPlayer() => _player;
+    
     // 이후 데이터파일에서 가져온다고 가정하면 type, path를 제외하고 Object ID만 전달
     public GameObject Spawn(Define.WorldObject type, string path, Transform parent = null)
     {

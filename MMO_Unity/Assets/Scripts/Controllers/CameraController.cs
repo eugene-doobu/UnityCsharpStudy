@@ -22,13 +22,13 @@ public class CameraController : MonoBehaviour
     {
         if (_mode == Define.CameraMode.QuaterView)
         {
-            if (_player.IsVaild())
+            if (!_player.IsVaild())
             {
                 return;
             }
             
             RaycastHit hit;
-            if (Physics.Raycast(_player.transform.position, _delta, out hit, _delta.magnitude, LayerMask.GetMask("Wall")))
+            if (Physics.Raycast(_player.transform.position, _delta, out hit, _delta.magnitude, LayerMask.GetMask("Block")))
             {
                 float dist = (hit.point - _player.transform.position).magnitude * 0.8f;
                 transform.position = _player.transform.position + _delta.normalized * dist;
