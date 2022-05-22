@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
@@ -16,6 +17,9 @@ public class Managers : MonoBehaviour
         }
     }
 
+    private GameManagerEx _game = new GameManagerEx();
+    public static GameManagerEx Game => Instance._game;
+    
     private DataManager _data = new DataManager();
     private InputManager _input = new InputManager();
     private PoolManager _pool = new PoolManager();

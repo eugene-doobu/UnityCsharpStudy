@@ -7,6 +7,11 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Define.CameraMode _mode = Define.CameraMode.QuaterView;
     [SerializeField] private Vector3 _delta = new Vector3(0, 6, -5);
     [SerializeField] private GameObject _player = null;
+
+    public void SetPlayer(GameObject player)
+    {
+        _player = player;
+    }
     
     void Start()
     {
@@ -17,6 +22,11 @@ public class CameraController : MonoBehaviour
     {
         if (_mode == Define.CameraMode.QuaterView)
         {
+            if (_player.IsVaild())
+            {
+                return;
+            }
+            
             RaycastHit hit;
             if (Physics.Raycast(_player.transform.position, _delta, out hit, _delta.magnitude, LayerMask.GetMask("Wall")))
             {
