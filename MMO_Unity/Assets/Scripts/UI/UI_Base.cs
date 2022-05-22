@@ -11,7 +11,12 @@ public abstract class UI_Base : MonoBehaviour
     private Dictionary<Type, UnityEngine.Object[]> _objects = new Dictionary<Type, Object[]>();
 
     public abstract void Init();
-    
+
+    private void Start()
+    {
+        Init();
+    }
+
     protected void Bind<T>(Type type) where T : UnityEngine.Object
     {
         string[] names = Enum.GetNames(type);
